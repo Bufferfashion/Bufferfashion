@@ -1,0 +1,151 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BUFFERSTATION | Fashion Store</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;color:#171717}
+header{background:#111;color:white;padding:20px;display:flex;justify-content:space-between;align-items:center}
+.logo{font-size:25px;font-weight:900;letter-spacing:3px}
+nav a{color:white;text-decoration:none;margin-left:12px}
+.hero{background:#171717;color:white;text-align:center;padding:75px 15px}
+.hero h1{font-size:46px;letter-spacing:5px;margin:0}
+.hero p{color:#ddd}
+.btn{background:white;color:black;padding:12px 22px;border:0;text-decoration:none;display:inline-block;cursor:pointer}
+section{padding:35px 5%}
+h2{text-align:center}
+.filters{text-align:center;margin:20px}
+.filters button{padding:10px 18px;margin:4px;background:white;border:1px solid black}
+.products{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.product{border:1px solid #eee;padding:10px}
+.product img{width:100%;height:190px;object-fit:cover}
+.product h3{font-size:15px}
+.product button,.cart button{width:100%;background:#111;color:white;border:0;padding:12px;cursor:pointer}
+.price{font-weight:bold}
+.cart{background:#f5f5f5;padding:20px}
+input,select{width:100%;padding:13px;margin:8px 0;border:1px solid #ccc}
+footer{background:#111;color:white;text-align:center;padding:30px}
+@media(min-width:700px){.products{grid-template-columns:repeat(4,1fr)}.product img{height:270px}}
+</style>
+</head>
+<body>
+
+<header>
+<div class="logo">BUFFERSTATION</div>
+<nav><a href="#products">SHOP</a><a href="#cart">CART 🛒 <span id="count">0</span></a></nav>
+</header>
+
+<div class="hero">
+<h1>BUFFERSTATION</h1>
+<p>YOUR STYLE. YOUR IDENTITY.</p>
+<a class="btn" href="#products">SHOP NOW</a>
+</div>
+
+<section id="products">
+<h2>OUR COLLECTION</h2>
+<div class="filters">
+<button onclick="show('All')">ALL</button>
+<button onclick="show('Men')">MEN</button>
+<button onclick="show('Women')">WOMEN</button>
+</div>
+<div class="products" id="productsList"></div>
+</section>
+
+<section id="cart">
+<div class="cart">
+<h2>YOUR CART</h2>
+<div id="items">Your cart is empty.</div>
+<h3>Total: ৳<span id="total">0</span></h3>
+<h3>Customer Details</h3>
+<input id="name" placeholder="Full name">
+<input id="phone" placeholder="Phone number">
+<input id="address" placeholder="Delivery address">
+<select id="payment">
+<option>Cash on Delivery</option>
+<option>bKash</option>
+<option>Nagad</option>
+</select>
+<p>For mobile banking, contact us for payment instructions. Never share your PIN or OTP.</p>
+<button onclick="order()">ORDER ON WHATSAPP</button>
+</div>
+</section>
+
+<footer>
+<h2>BUFFERSTATION</h2>
+<p>Wear Your Confidence.</p>
+<p>bKash | Nagad | Cash on Delivery</p>
+<p>© 2026 BUFFERSTATION</p>
+</footer>
+
+<script>
+// Replace with your WhatsApp number, including 880
+const WHATSAPP="8801XXXXXXXXX";
+
+const products=[
+{id:1,name:"Black T-Shirt",price:650,cat:"Men",img:"https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500"},
+{id:2,name:"White T-Shirt",price:550,cat:"Men",img:"https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=500"},
+{id:3,name:"Casual Hoodie",price:1200,cat:"Men",img:"https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=500"},
+{id:4,name:"Women's Top",price:750,cat:"Women",img:"https://images.unsplash.com/photo-1483985988355-763728e1935b?w=500"},
+{id:5,name:"Women's Dress",price:1450,cat:"Women",img:"https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=500"},
+{id:6,name:"Stylish Shirt",price:950,cat:"Men",img:"https://images.unsplash.com/photo-1598033129183-c4f50c736f10?w=500"}
+];
+
+let cart=[];
+
+function show(category){
+document.getElementById("productsList").innerHTML="";
+products.filter(p=>category==="All"||p.cat===category).forEach(p=>{
+document.getElementById("productsList").innerHTML+=`
+<div class="product">
+<img src="${p.img}" alt="${p.name}">
+<h3>${p.name}</h3>
+<p class="price">৳${p.price}</p>
+<button onclick="add(${p.id})">ADD TO CART</button>
+</div>`;
+});
+}
+
+function add(id){
+let p=cart.find(x=>x.id===id);
+if(p)p.qty++;
+else cart.push({...products.find(x=>x.id===id),qty:1});
+update();
+}
+
+function update(){
+let total=0,count=0;
+document.getElementById("items").innerHTML=cart.map(p=>{
+total+=p.price*p.qty;count+=p.qty;
+return `<p>${p.name} × ${p.qty} — ৳${p.price*p.qty}
+<button onclick="removeItem(${p.id})">Remove</button></p>`;
+}).join("")||"Your cart is empty.";
+document.getElementById("total").textContent=total;
+document.getElementById("count").textContent=count;
+}
+
+function removeItem(id){
+cart=cart.filter(p=>p.id!==id);
+update();
+}
+
+function order(){
+let name=document.getElementById("name").value.trim();
+let phone=document.getElementById("phone").value.trim();
+let address=document.getElementById("address").value.trim();
+let payment=document.getElementById("payment").value;
+if(!cart.length)return alert("Your cart is empty!");
+if(!name||!phone||!address)return alert("Complete your details first!");
+if(WHATSAPP.includes("X"))return alert("Store owner: Set your WhatsApp number in the code first.");
+let message=`BUFFERSTATION ORDER\nName: ${name}\nPhone: ${phone}\nAddress: ${address}\nPayment: ${payment}\n`;
+cart.forEach(p=>message+=`${p.name} x ${p.qty} = Tk ${p.price*p.qty}\n`);
+message+=`Total: Tk ${cart.reduce((s,p)=>s+p.price*p.qty,0)}`;
+window.open("https://wa.me/"+WHATSAPP+"?text="+encodeURIComponent(message),"_blank");
+}
+
+show("All");
+</script>
+</body>
+</html>
